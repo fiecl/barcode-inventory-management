@@ -1,0 +1,13 @@
+# Node modules for frontend
+bim_frontend/node_modules/
+
+# Python virtual env for backend
+backend/venv/
+bim_backend/app/__pycache__/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

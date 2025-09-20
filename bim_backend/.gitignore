@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.db
+
+# Virtual environments
+.env
+venv/
+.env/
+.venv/
+conda_env/
+
+# Environment variables
+.env
+
+# VSCode
+.vscode/
+
+# macOS / Linux / Windows cruft
+.DS_Store
+Thumbs.db
