@@ -72,29 +72,3 @@ class ScanLogOut(ScanLogBase):
 
     class Config:
         orm_mode = True
-
-# class ProductInfo(BaseModel):
-#     id: int
-#     name: str
-#     barcode: str
-#     quantity: int
-#     threshold: int
-
-#     class Config:
-#         orm_mode = True
-
-# class ScanLogBase(BaseModel):
-#     purpose: str
-#     scanned_by: str
-
-# class ScanLogCreate(ScanLogBase):
-#     product_id: int
-
-# class ScanLogOut(ScanLogBase):
-#     id: int
-#     product_id: int
-#     scanned_at: datetime
-#     product: ProductInfo
-
-#     class Config:
-#         orm_mode = True

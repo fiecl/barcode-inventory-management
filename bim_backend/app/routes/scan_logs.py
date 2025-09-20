@@ -6,15 +6,6 @@ from app.database import get_db
 
 router = APIRouter(prefix="/scan_logs", tags=["scan_logs"])
 
-# @router.post("/", response_model=schemas.ScanLogOut)
-# def create_scan_log(scan_log: schemas.ScanLogCreate, db: Session = Depends(get_db)):
-#     # Verify product exists
-#     print("Create scan log endpoint is working...")
-#     product = db.query(crud.models.ProductDB).filter_by(id=scan_log.product_id).first()
-#     if not product:
-#         raise HTTPException(status_code=404, detail="Product not found")
-#     return crud.create_scan_log(db, scan_log)
-
 @router.post("/", response_model=schemas.ScanLogOut)
 def create_scan_log(scan: schemas.ScanLogCreate, db: Session = Depends(get_db)):
     product = db.query(crud.models.ProductDB).filter(crud.models.ProductDB.id == scan.product_id).first()

@@ -16,7 +16,7 @@ import API_URL from "@/constants/api";
 export default function ProductsScreen() {
   const [products, setProducts] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
-  const [showControls, setShowControls] = useState(false); // ← manage mode
+  const [showControls, setShowControls] = useState(false); // manage mode
   const colorScheme = useColorScheme();
 
   const fetchProducts = async () => {
@@ -119,7 +119,7 @@ export default function ProductsScreen() {
                 )
               }
               keyboardType="numeric"
-              editable={showControls} // ← only editable in edit mode
+              editable={showControls} // only editable in edit mode
               style={[
                 styles.input,
                 {
@@ -144,7 +144,7 @@ export default function ProductsScreen() {
                 )
               }
               keyboardType="numeric"
-              editable={showControls} // ← only editable in edit mode
+              editable={showControls} // only editable in edit mode
               style={[
                 styles.input,
                 {
@@ -292,120 +292,3 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
-
-// import React, { useState, useEffect, useCallback } from "react";
-// import {
-//   View,
-//   Text,
-//   FlatList,
-//   StyleSheet,
-//   RefreshControl,
-//   useColorScheme,
-// } from "react-native";
-// import axios from "axios";
-
-// export default function ProductsScreen() {
-//   const [products, setProducts] = useState<any[]>([]);
-//   const [refreshing, setRefreshing] = useState(false);
-//   const colorScheme = useColorScheme(); // light or dark
-
-//   const fetchProducts = async () => {
-//     try {
-//       const response = await axios.get("http://192.168.1.14:8000/products");
-//       setProducts(response.data);
-//     } catch (err) {
-//       console.error("Error fetching products:", err);
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchProducts();
-//   }, []);
-
-//   const onRefresh = useCallback(async () => {
-//     setRefreshing(true);
-//     await fetchProducts();
-//     setRefreshing(false);
-//   }, []);
-
-//   const renderItem = ({ item }: { item: any }) => (
-//     <View
-//       style={[
-//         styles.item,
-//         {
-//           backgroundColor:
-//             colorScheme === "dark" ? "#1e1e1e" : "#fff",
-//           borderColor: colorScheme === "dark" ? "#333" : "#ccc",
-//         },
-//       ]}
-//     >
-//       <Text
-//         style={[
-//           styles.name,
-//           { color: colorScheme === "dark" ? "#fff" : "#000" },
-//         ]}
-//       >
-//         {item.name}
-//       </Text>
-//       <Text style={{ color: colorScheme === "dark" ? "#ccc" : "#555" }}>
-//         Quantity: {item.quantity}
-//       </Text>
-//       <Text style={{ color: colorScheme === "dark" ? "#ccc" : "#555" }}>
-//         Threshold: {item.threshold}
-//       </Text>
-//       <Text
-//         style={{
-//           color:
-//             item.status === "High"
-//               ? "#4caf50"
-//               : item.status === "Warning"
-//               ? "#ff9800"
-//               : "#f44336",
-//           fontWeight: "600",
-//           marginTop: 4,
-//         }}
-//       >
-//         Status: {item.status}
-//       </Text>
-//     </View>
-//   );
-
-//   return (
-//     <FlatList
-//       data={products}
-//       keyExtractor={(item) => item.id.toString()}
-//       renderItem={renderItem}
-//       refreshControl={
-//         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-//       }
-//       contentContainerStyle={[
-//         styles.listContainer,
-//         { backgroundColor: colorScheme === "dark" ? "#121212" : "#f5f5f5" },
-//       ]}
-//     />
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   listContainer: {
-//     paddingTop: 75,
-//     paddingLeft: 20,
-//     paddingRight: 20
-//   },
-//   item: {
-//     padding: 16,
-//     borderWidth: 1,
-//     borderRadius: 10,
-//     marginBottom: 12,
-//     shadowColor: "#000",
-//     shadowOpacity: 0.1,
-//     shadowRadius: 5,
-//     shadowOffset: { width: 0, height: 2 },
-//     elevation: 3, // for Android shadow
-//   },
-//   name: {
-//     fontWeight: "bold",
-//     fontSize: 18,
-//     marginBottom: 4,
-//   },
-// });
