@@ -92,6 +92,15 @@ def delete_product(barcode_value: str, db: Session = Depends(get_db)):
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
+    # Delete the barcode file
+    if product.barcode_file:
+        file_path = os.path.join(BARCODE_DIR, os.path.basename(product.barcode_file))
+        if os.path.isfile(file_path):
+            try:
+                os.remove(file_path)
+            except Exception as e:
+                print(f"Failed to delete file {file_path}: {e}")
+                
     db.delete(product)
     db.commit()
     return {"message": f"Product '{barcode_value}' deleted successfully"}
