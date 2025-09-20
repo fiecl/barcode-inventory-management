@@ -1,9 +1,6 @@
 from sqlalchemy.orm import Session
 from app import models, schemas
 from datetime import datetime, timedelta
-# import pytz
-
-# LOCAL_TZ = pytz.timezone("Asia/Manila")  # change to your local timezone
 
 # ---------- Product CRUD ----------
 def create_product(db: Session, product: schemas.ProductCreate, barcode: str, barcode_file: str):
