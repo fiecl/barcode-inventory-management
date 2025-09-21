@@ -12,3 +12,5 @@ __pycache__/
 # macOS / Linux / Windows cruft
 .DS_Store
 Thumbs.db
+
+barcodes/
