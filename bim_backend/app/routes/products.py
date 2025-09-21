@@ -94,7 +94,8 @@ def delete_product(barcode_value: str, db: Session = Depends(get_db)):
 
     # Delete the barcode file
     if product.barcode_file:
-        file_path = os.path.join(BARCODE_DIR, os.path.basename(product.barcode_file))
+        # file_path = os.path.join(BARCODE_DIR, os.path.basename(product.barcode_file))
+        file_path = product.barcode_file
         if os.path.isfile(file_path):
             try:
                 os.remove(file_path)
