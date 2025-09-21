@@ -72,7 +72,7 @@ export default function ScanLogsScreen() {
 
         <View style={styles.row}>
           <Text style={{ color: colorScheme === "dark" ? "#ccc" : "#555" }}>
-            Quantity: {item.quantity}
+            Remaining Quantity: {item.quantity}
           </Text>
           <Text style={{ color: colorScheme === "dark" ? "#ccc" : "#555" }}>
             Threshold: {item.threshold}

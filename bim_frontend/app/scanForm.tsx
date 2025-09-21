@@ -42,7 +42,7 @@ export default function ScanFormScreen() {
           product_threshold !== undefined ? parseInt(product_threshold, 10) : 0,
       });
 
-      Alert.alert("Success", `Scan log saved for ${barcode}`);
+      Alert.alert("Success", `Scan log saved for barcode: ${barcode}`);
       router.back();
     } catch (error: any) {
       console.error("Submit error:", error);
