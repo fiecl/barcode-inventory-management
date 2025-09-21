@@ -92,15 +92,29 @@ def delete_product(barcode_value: str, db: Session = Depends(get_db)):
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    # Delete the barcode file
+    # # Delete the barcode file
+    # if product.barcode_file:
+    #     file_path = os.path.normpath(product.barcode_file)  # normalize path for OS
+    #     if os.path.isfile(file_path):
+    #         try:
+    #             os.remove(file_path)
+    #         except Exception as e:
+    #             print(f"Failed to delete file {file_path}: {e}")
+
+    # Delete PNG file if exists
     if product.barcode_file:
-        # file_path = os.path.join(BARCODE_DIR, os.path.basename(product.barcode_file))
-        file_path = product.barcode_file
+        # Normalize the path to handle single backslashes
+        normalized_path = os.path.normpath(product.barcode_file)
+        print(f"Normalized Path: {normalized_path}")
+        file_path = f"{os.path.join(os.getcwd(), normalized_path)}.png"
+        print(f"File path: {file_path}")
+
         if os.path.isfile(file_path):
             try:
                 os.remove(file_path)
+                print(f"Deleted barcode file: {file_path}")
             except Exception as e:
-                print(f"Failed to delete file {file_path}: {e}")
+                pass
 
     db.delete(product)
     db.commit()
