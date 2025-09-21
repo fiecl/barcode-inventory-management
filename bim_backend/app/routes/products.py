@@ -27,7 +27,7 @@ def create_product(product: schemas.ProductCreate, db: Session = Depends(get_db)
         raise HTTPException(status_code=500, detail="Failed to generate unique barcode")
 
     # Save barcode image
-    file_path = os.path.join(BARCODE_DIR, f"{barcode_value}.png")
+    file_path = os.path.join(BARCODE_DIR, f"{barcode_value}")
     code128 = barcode.get("code128", barcode_value, writer=ImageWriter())
     code128.save(file_path)
 
@@ -100,7 +100,7 @@ def delete_product(barcode_value: str, db: Session = Depends(get_db)):
                 os.remove(file_path)
             except Exception as e:
                 print(f"Failed to delete file {file_path}: {e}")
-                
+
     db.delete(product)
     db.commit()
     return {"message": f"Product '{barcode_value}' deleted successfully"}
