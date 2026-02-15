@@ -8,6 +8,8 @@ def create_product(db: Session, product: schemas.ProductCreate, barcode: str, ba
         name=product.name,
         threshold=product.threshold,
         quantity=product.quantity,
+        quantity_to_order=product.quantity_to_order,
+        classification=product.classification,
         barcode=barcode, # numeric scannable
         barcode_file=barcode_file,
     )

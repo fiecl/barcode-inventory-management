@@ -15,7 +15,7 @@ def get_admin_emails(db: Session) -> list[str]:
     return [row.email for row in db.query(EmailSettingsDB).all()]
 
 
-def send_threshold_email(recipients: list[str] | str, product_name: str, qty: int, threshold: int):
+def send_threshold_email(recipients: list[str] | str, product_name: str, qty: int, threshold: int, qty_to_order: int):
     """Send a professional stock threshold alert email to one or more recipients."""
     # Ensure recipients is always a list
     if isinstance(recipients, str):
@@ -33,6 +33,7 @@ This is an automated notification regarding your product inventory.
 Product: {product_name}
 Current Quantity: {qty}
 Threshold: {threshold}
+Quantity to Order: {qty_to_order}
 
 The stock level has reached or fallen below the defined threshold. 
 Please take the necessary steps to restock this item promptly to avoid shortages.

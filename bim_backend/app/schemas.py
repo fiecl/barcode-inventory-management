@@ -12,10 +12,14 @@ class ProductBase(BaseModel):
 
 class ProductCreate(ProductBase):
     quantity: int
+    quantity_to_order: int
+    classification: str
 
 class ProductOut(ProductBase):
     id: int
     quantity: int
+    quantity_to_order: int
+    classification: Optional[str] = None
     barcode: str
     barcode_file: Optional[str]
     status: Optional[str] = None  # Derived field (High/Warning/Low)
@@ -28,6 +32,8 @@ class ProductUpdate(BaseModel):
     name: Optional[str] = None
     threshold: Optional[int] = None
     quantity: Optional[int] = None
+    quantity_to_order: Optional[int] = None
+    classification: str
     barcode: Optional[str] = None
     barcode_file: Optional[str] = None
 
@@ -51,16 +57,25 @@ class ProductInfo(BaseModel):
     barcode: str
     quantity: int
     threshold: int
+    classification: str
 
     class Config:
         orm_mode = True
 
+# class ScanLogBase(BaseModel):
+#     purpose: str
+#     scanned_by: str
+#     product_id: int
+#     quantity: int
+#     threshold: int
 class ScanLogBase(BaseModel):
     purpose: str
     scanned_by: str
     product_id: int
     quantity: int
     threshold: int
+    classification: str
+    decremented_by: int  # NEW
 
 class ScanLogCreate(ScanLogBase):
     pass
@@ -72,3 +87,7 @@ class ScanLogOut(ScanLogBase):
 
     class Config:
         orm_mode = True
+
+# ---------- For Product Scan ----------
+class ProductScan(BaseModel):
+    decrement_by: int

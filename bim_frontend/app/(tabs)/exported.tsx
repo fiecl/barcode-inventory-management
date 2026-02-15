@@ -23,7 +23,7 @@ export default function ScanLogsScreen() {
       const response = await axios.get(`${API_URL}/scan_logs/`);
       const sortedLogs = response.data.sort(
         (a: any, b: any) =>
-          new Date(b.scanned_at).getTime() - new Date(a.scanned_at).getTime()
+          new Date(b.scanned_at).getTime() - new Date(a.scanned_at).getTime(),
       );
       setLogs(sortedLogs);
     } catch (err) {
@@ -65,19 +65,29 @@ export default function ScanLogsScreen() {
         ]}
       >
         <Text
-          style={[styles.name, { color: colorScheme === "dark" ? "#fff" : "#000" }]}
+          style={[
+            styles.name,
+            { color: colorScheme === "dark" ? "#fff" : "#000" },
+          ]}
         >
           {product.name} ({product.barcode})
         </Text>
 
         <View style={styles.row}>
           <Text style={{ color: colorScheme === "dark" ? "#ccc" : "#555" }}>
-            Remaining Quantity: {item.quantity}
+            Exported: {item.decremented_by}
           </Text>
           <Text style={{ color: colorScheme === "dark" ? "#ccc" : "#555" }}>
-            Threshold: {item.threshold}
+            Remaining QTY: {item.quantity}
           </Text>
         </View>
+
+        <Text style={{ color: colorScheme === "dark" ? "#ccc" : "#555" }}>
+          Classification: {item.classification}
+        </Text>
+        <Text style={{ color: colorScheme === "dark" ? "#ccc" : "#555" }}>
+          Threshold: {item.threshold}
+        </Text>
 
         <Text style={{ color: colorScheme === "dark" ? "#ccc" : "#555" }}>
           Purpose: {item.purpose}
@@ -120,7 +130,9 @@ export default function ScanLogsScreen() {
         data={logs}
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
         contentContainerStyle={[
           styles.listContainer,
           { backgroundColor: colorScheme === "dark" ? "#121212" : "#f5f5f5" },
@@ -131,7 +143,12 @@ export default function ScanLogsScreen() {
 }
 
 const styles = StyleSheet.create({
-  listContainer: { paddingTop: 20, paddingLeft: 20, paddingRight: 20, paddingBottom: 20 },
+  listContainer: {
+    paddingTop: 20,
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingBottom: 20,
+  },
   item: {
     padding: 16,
     borderWidth: 1,
@@ -144,7 +161,11 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   name: { fontWeight: "bold", fontSize: 18, marginBottom: 8 },
-  row: { flexDirection: "row", justifyContent: "space-between", marginBottom: 8 },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
   deleteBtn: {
     marginTop: 10,
     padding: 10,

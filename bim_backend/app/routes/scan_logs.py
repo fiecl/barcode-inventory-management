@@ -12,12 +12,21 @@ def create_scan_log(scan: schemas.ScanLogCreate, db: Session = Depends(get_db)):
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
+    # db_log = crud.models.ScanLog(
+    #     purpose=scan.purpose,
+    #     scanned_by=scan.scanned_by,
+    #     product_id=scan.product_id,
+    #     quantity=product.quantity,
+    #     threshold=product.threshold
+    # )
     db_log = crud.models.ScanLog(
         purpose=scan.purpose,
         scanned_by=scan.scanned_by,
         product_id=scan.product_id,
         quantity=product.quantity,
-        threshold=product.threshold
+        threshold=product.threshold,
+        decremented_by=scan.decremented_by,  # NEW
+        classification=product.classification  # NEW
     )
     db.add(db_log)
     db.commit()

@@ -26,6 +26,8 @@ export default function ProductsScreen() {
         ...p,
         editableQuantity: p.quantity.toString(),
         editableThreshold: p.threshold.toString(),
+        editableQuantityToOrder: p.quantity_to_order.toString(),
+        editableClassification: p.classification
       }));
       setProducts(editableProducts);
     } catch (err) {
@@ -46,13 +48,16 @@ export default function ProductsScreen() {
   const handleUpdate = async (
     barcode: string,
     quantity: string,
-    threshold: string
+    threshold: string,
+    quantityToOrder: string,
+    classification: string
   ) => {
     const qty = parseInt(quantity, 10);
     const thr = parseInt(threshold, 10);
+    const qtyToOrder = parseInt(quantityToOrder, 10);
 
     // Validation check
-    if (qty > 999999 || thr > 999999) {
+    if (qty > 999999 || thr > 999999 || qtyToOrder > 999999)  {
       Alert.alert(
         "Validation Error",
         "Quantity and Threshold cannot exceed 999,999"
@@ -64,6 +69,8 @@ export default function ProductsScreen() {
       await axios.patch(`${API_URL}/products/${barcode}`, {
         quantity: parseInt(quantity, 10),
         threshold: parseInt(threshold, 10),
+        quantity_to_order: parseInt(quantityToOrder, 10),
+        classification: classification
       });
       Alert.alert("Success", "Product updated successfully");
       fetchProducts();
@@ -154,6 +161,55 @@ export default function ProductsScreen() {
               ]}
             />
           </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={{ color: colorScheme === "dark" ? "#ccc" : "#555" }}>
+              QTY to Order
+            </Text>
+            <TextInput
+              value={item.editableQuantityToOrder}
+              onChangeText={(text) =>
+                setProducts((prev) =>
+                  prev.map((p) =>
+                    p.id === item.id ? { ...p, editableQuantityToOrder: text } : p
+                  )
+                )
+              }
+              keyboardType="numeric"
+              editable={showControls} // only editable in edit mode
+              style={[
+                styles.input,
+                {
+                  color: colorScheme === "dark" ? "#fff" : "#000",
+                  borderColor: colorScheme === "dark" ? "#555" : "#ccc",
+                },
+              ]}
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={{ color: colorScheme === "dark" ? "#ccc" : "#555" }}>
+              Classification
+            </Text>
+            <TextInput
+              value={item.editableClassification}
+              onChangeText={(text) =>
+                setProducts((prev) =>
+                  prev.map((p) =>
+                    p.id === item.id ? { ...p, editableClassification: text } : p
+                  )
+                )
+              }
+              editable={showControls} // only editable in edit mode
+              style={[
+                styles.input,
+                {
+                  color: colorScheme === "dark" ? "#fff" : "#000",
+                  borderColor: colorScheme === "dark" ? "#555" : "#ccc",
+                },
+              ]}
+            />
+          </View>
         </View>
 
         {showControls && (
@@ -164,7 +220,9 @@ export default function ProductsScreen() {
                 handleUpdate(
                   item.barcode,
                   item.editableQuantity,
-                  item.editableThreshold
+                  item.editableThreshold,
+                  item.editableQuantityToOrder,
+                  item.editableClassification
                 )
               }
             >
