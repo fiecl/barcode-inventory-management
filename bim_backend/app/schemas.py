@@ -18,7 +18,7 @@ class ProductOut(ProductBase):
     quantity: int
     barcode: str
     barcode_file: Optional[str]
-    status: Optional[str]  # Derived field (High/Warning/Low)
+    status: Optional[str] = None  # Derived field (High/Warning/Low)
 
     class Config:
         orm_mode = True

@@ -1,10 +1,12 @@
 # Node modules for frontend
 bim_frontend/node_modules/
+bim_frontend/constants/api.ts
 
 # Python virtual env for backend
 backend/venv/
 bim_backend/app/__pycache__/
 bim_backend/barcodes/
+bim_backend/.env
 
 # Logs
 *.log
