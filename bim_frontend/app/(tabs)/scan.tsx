@@ -40,7 +40,8 @@ export default function ScanScreen() {
           barcode: product.barcode,
           product_id: product.id.toString(),
           product_quantity: product.quantity,
-          product_threshold: product.threshold
+          product_threshold: product.threshold,
+          product_classification: product.classification
         },
       });
     } catch (error: any) {

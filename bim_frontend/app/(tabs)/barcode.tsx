@@ -16,6 +16,8 @@ export default function BarcodeScreen() {
   const [name, setName] = useState("");
   const [threshold, setThreshold] = useState("");
   const [quantity, setQuantity] = useState("");
+  const [quantityToOrder, setQuantityToOrder] = useState("");
+  const [classification, setClassification] = useState("");
   const colorScheme = useColorScheme(); // "dark" or "light"
   const isDark = colorScheme === "dark";
 
@@ -23,15 +25,16 @@ export default function BarcodeScreen() {
   // Handle Generate Barcode
   // ----------------------------
   const handleGenerate = async () => {
-    if (!name || !threshold || !quantity) {
+    if (!name || !threshold || !quantity || !classification) {
       Alert.alert("Error", "Please fill in all fields");
       return;
     }
     const qty = parseInt(quantity, 10);
     const thr = parseInt(threshold, 10);
+    const qtyToOrder = parseInt(quantityToOrder, 10);
 
     // Validation check
-    if (qty > 999999 || thr > 999999) {
+    if (qty > 999999 || thr > 999999 || qtyToOrder > 999999) {
       Alert.alert(
         "Validation Error",
         "Quantity and Threshold cannot exceed 999,999"
@@ -44,6 +47,8 @@ export default function BarcodeScreen() {
         name,
         threshold: parseInt(threshold, 10),
         quantity: parseInt(quantity, 10),
+        quantity_to_order: parseInt(quantityToOrder, 10),
+        classification
       });
 
       Alert.alert("Success", `Barcode generated: ${response.data.barcode}`);
@@ -136,6 +141,24 @@ export default function BarcodeScreen() {
       />
 
       <Text style={[styles.label, { color: isDark ? "#fff" : "#000" }]}>
+        Classification
+      </Text>
+      <TextInput
+        style={[
+          styles.input,
+          {
+            backgroundColor: isDark ? "#1e1e1e" : "#fff",
+            color: isDark ? "#fff" : "#000",
+            borderColor: isDark ? "#333" : "#ccc",
+          },
+        ]}
+        value={classification}
+        onChangeText={setClassification}
+        placeholder="Enter classification"
+        placeholderTextColor={isDark ? "#aaa" : "#888"}
+      />
+
+      <Text style={[styles.label, { color: isDark ? "#fff" : "#000" }]}>
         Threshold
       </Text>
       <TextInput
@@ -169,6 +192,25 @@ export default function BarcodeScreen() {
         value={quantity}
         onChangeText={setQuantity}
         placeholder="Enter quantity"
+        keyboardType="numeric"
+        placeholderTextColor={isDark ? "#aaa" : "#888"}
+      />
+
+      <Text style={[styles.label, { color: isDark ? "#fff" : "#000" }]}>
+        Quantity to Order
+      </Text>
+      <TextInput
+        style={[
+          styles.input,
+          {
+            backgroundColor: isDark ? "#1e1e1e" : "#fff",
+            color: isDark ? "#fff" : "#000",
+            borderColor: isDark ? "#333" : "#ccc",
+          },
+        ]}
+        value={quantityToOrder}
+        onChangeText={setQuantityToOrder}
+        placeholder="Enter quantity to order"
         keyboardType="numeric"
         placeholderTextColor={isDark ? "#aaa" : "#888"}
       />

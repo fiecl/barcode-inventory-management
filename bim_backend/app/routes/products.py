@@ -120,18 +120,61 @@ def delete_product(barcode_value: str, db: Session = Depends(get_db)):
     db.commit()
     return {"message": f"Product '{barcode_value}' deleted successfully"}
 
+# @router.post("/scan/{barcode_value}", response_model=schemas.ProductOut)
+# def scan_product(
+#     barcode_value: str,
+#     background_tasks: BackgroundTasks,
+#     db: Session = Depends(get_db),
+# ):
+#     """Decrement product quantity when scanned, trigger email if threshold crossed"""
+#     product = crud.update_product_quantity(db, barcode_value, -1)
+#     if not product:
+#         raise HTTPException(status_code=404, detail="Product not found")
+
+#     # Email alert if threshold crossed
+#     if product.quantity <= product.threshold:
+#         recipients = email_service.get_admin_emails(db)
+#         for recipient in recipients:
+#             background_tasks.add_task(
+#                 email_service.send_threshold_email,
+#                 recipient,
+#                 product.name,
+#                 product.quantity,
+#                 product.threshold,
+#                 product.quantity_to_order
+#             )
+
+#     return _with_status(product)
+
 @router.post("/scan/{barcode_value}", response_model=schemas.ProductOut)
 def scan_product(
     barcode_value: str,
+    scan: schemas.ProductScan,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ):
-    """Decrement product quantity when scanned, trigger email if threshold crossed"""
-    product = crud.update_product_quantity(db, barcode_value, -1)
+    """Decrement product quantity safely, prevent negative stock"""
+
+    if scan.decrement_by <= 0:
+        raise HTTPException(status_code=400, detail="Decrement must be greater than 0")
+
+    product = crud.get_product_by_barcode(db, barcode_value)
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    # Email alert if threshold crossed
+    # 🚨 Prevent subtracting more than available
+    if scan.decrement_by > product.quantity:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot subtract {scan.decrement_by}. Only {product.quantity} left."
+        )
+
+    # Safe subtraction
+    product.quantity -= scan.decrement_by
+    db.commit()
+    db.refresh(product)
+
+    # Threshold email
     if product.quantity <= product.threshold:
         recipients = email_service.get_admin_emails(db)
         for recipient in recipients:
@@ -141,9 +184,11 @@ def scan_product(
                 product.name,
                 product.quantity,
                 product.threshold,
+                product.quantity_to_order
             )
 
     return _with_status(product)
+
 
 
 @router.put("/{barcode_value}/quantity/{new_quantity}", response_model=schemas.ProductOut)
@@ -172,6 +217,7 @@ def update_quantity(
                 product.name,
                 product.quantity,
                 product.threshold,
+                product.quantity_to_order
             )
 
     return _with_status(product)
@@ -191,6 +237,8 @@ def _with_status(product: models.ProductDB) -> schemas.ProductOut:
         name=product.name,
         threshold=product.threshold,
         quantity=product.quantity,
+        quantity_to_order=product.quantity_to_order,
+        classification=product.classification,
         barcode=product.barcode,
         barcode_file=product.barcode_file,
         status=status,
