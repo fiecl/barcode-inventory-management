@@ -11,12 +11,32 @@ import {
 } from "react-native";
 import axios from "axios";
 import API_URL from "@/constants/api";
+import * as SecureStore from "expo-secure-store";
+import { useRouter } from "expo-router";
 
 export default function ScanLogsScreen() {
   const [logs, setLogs] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [showControls, setShowControls] = useState(false); // manage controls
   const colorScheme = useColorScheme();
+  const [role, setRole] = useState<string | null>(null);
+
+  // inside your component function
+  const router = useRouter();
+
+  // Fetch role from SecureStore
+  useEffect(() => {
+    const fetchRole = async () => {
+      const storedRole = await SecureStore.getItemAsync("role");
+      setRole(storedRole);
+    };
+    fetchRole();
+  }, []);
+
+  const handleLogout = async () => {
+    await SecureStore.deleteItemAsync("token"); // remove saved token
+    router.replace("/login"); // redirect to login screen
+  };
 
   const fetchLogs = async () => {
     try {
@@ -114,15 +134,27 @@ export default function ScanLogsScreen() {
 
   return (
     <View style={{ flex: 1 }}>
-      {/* Show/Hide Controls toggle */}
+      {/* Settings toggle and Logout button */}
       <View style={styles.settingsContainer}>
+        {role !== "GM" && (
+          <TouchableOpacity
+            onPress={() => setShowControls(!showControls)}
+            style={styles.settingsButton}
+          >
+            <Text style={styles.settingsText}>
+              {showControls ? "Hide Controls" : "Show Controls"}
+            </Text>
+          </TouchableOpacity>
+        )}
+
         <TouchableOpacity
-          onPress={() => setShowControls(!showControls)}
-          style={styles.settingsButton}
+          onPress={handleLogout}
+          style={[
+            styles.settingsButton,
+            { backgroundColor: "#f44336", marginTop: 10 },
+          ]}
         >
-          <Text style={styles.settingsText}>
-            {showControls ? "Hide Controls" : "Show Controls"}
-          </Text>
+          <Text style={styles.settingsText}>Logout</Text>
         </TouchableOpacity>
       </View>
 
@@ -140,6 +172,34 @@ export default function ScanLogsScreen() {
       />
     </View>
   );
+  // return (
+  //   <View style={{ flex: 1 }}>
+  //     {/* Show/Hide Controls toggle */}
+  //     <View style={styles.settingsContainer}>
+  //       <TouchableOpacity
+  //         onPress={() => setShowControls(!showControls)}
+  //         style={styles.settingsButton}
+  //       >
+  //         <Text style={styles.settingsText}>
+  //           {showControls ? "Hide Controls" : "Show Controls"}
+  //         </Text>
+  //       </TouchableOpacity>
+  //     </View>
+
+  //     <FlatList
+  //       data={logs}
+  //       keyExtractor={(item) => item.id.toString()}
+  //       renderItem={renderItem}
+  //       refreshControl={
+  //         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+  //       }
+  //       contentContainerStyle={[
+  //         styles.listContainer,
+  //         { backgroundColor: colorScheme === "dark" ? "#121212" : "#f5f5f5" },
+  //       ]}
+  //     />
+  //   </View>
+  // );
 }
 
 const styles = StyleSheet.create({

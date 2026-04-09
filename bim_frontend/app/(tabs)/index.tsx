@@ -12,12 +12,22 @@ import {
 } from "react-native";
 import axios from "axios";
 import API_URL from "@/constants/api";
+import * as SecureStore from "expo-secure-store";
 
 export default function ProductsScreen() {
   const [products, setProducts] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [showControls, setShowControls] = useState(false); // manage mode
   const colorScheme = useColorScheme();
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchRole = async () => {
+      const storedRole = await SecureStore.getItemAsync("role");
+      setRole(storedRole);
+    };
+    fetchRole();
+  }, []);
 
   const fetchProducts = async () => {
     try {
@@ -27,7 +37,7 @@ export default function ProductsScreen() {
         editableQuantity: p.quantity.toString(),
         editableThreshold: p.threshold.toString(),
         editableQuantityToOrder: p.quantity_to_order.toString(),
-        editableClassification: p.classification
+        editableClassification: p.classification,
       }));
       setProducts(editableProducts);
     } catch (err) {
@@ -50,17 +60,17 @@ export default function ProductsScreen() {
     quantity: string,
     threshold: string,
     quantityToOrder: string,
-    classification: string
+    classification: string,
   ) => {
     const qty = parseInt(quantity, 10);
     const thr = parseInt(threshold, 10);
     const qtyToOrder = parseInt(quantityToOrder, 10);
 
     // Validation check
-    if (qty > 999999 || thr > 999999 || qtyToOrder > 999999)  {
+    if (qty > 999999 || thr > 999999 || qtyToOrder > 999999) {
       Alert.alert(
         "Validation Error",
-        "Quantity and Threshold cannot exceed 999,999"
+        "Quantity and Threshold cannot exceed 999,999",
       );
       return;
     }
@@ -70,7 +80,7 @@ export default function ProductsScreen() {
         quantity: parseInt(quantity, 10),
         threshold: parseInt(threshold, 10),
         quantity_to_order: parseInt(quantityToOrder, 10),
-        classification: classification
+        classification: classification,
       });
       Alert.alert("Success", "Product updated successfully");
       fetchProducts();
@@ -111,6 +121,7 @@ export default function ProductsScreen() {
           {item.name} ({item.barcode})
         </Text>
 
+        {/* Row for Quantity, Threshold, Order QTY */}
         <View style={styles.row}>
           <View style={styles.inputGroup}>
             <Text style={{ color: colorScheme === "dark" ? "#ccc" : "#555" }}>
@@ -121,12 +132,12 @@ export default function ProductsScreen() {
               onChangeText={(text) =>
                 setProducts((prev) =>
                   prev.map((p) =>
-                    p.id === item.id ? { ...p, editableQuantity: text } : p
-                  )
+                    p.id === item.id ? { ...p, editableQuantity: text } : p,
+                  ),
                 )
               }
               keyboardType="numeric"
-              editable={showControls} // only editable in edit mode
+              editable={showControls}
               style={[
                 styles.input,
                 {
@@ -146,12 +157,12 @@ export default function ProductsScreen() {
               onChangeText={(text) =>
                 setProducts((prev) =>
                   prev.map((p) =>
-                    p.id === item.id ? { ...p, editableThreshold: text } : p
-                  )
+                    p.id === item.id ? { ...p, editableThreshold: text } : p,
+                  ),
                 )
               }
               keyboardType="numeric"
-              editable={showControls} // only editable in edit mode
+              editable={showControls}
               style={[
                 styles.input,
                 {
@@ -164,43 +175,21 @@ export default function ProductsScreen() {
 
           <View style={styles.inputGroup}>
             <Text style={{ color: colorScheme === "dark" ? "#ccc" : "#555" }}>
-              QTY to Order
+              Order QTY
             </Text>
             <TextInput
               value={item.editableQuantityToOrder}
               onChangeText={(text) =>
                 setProducts((prev) =>
                   prev.map((p) =>
-                    p.id === item.id ? { ...p, editableQuantityToOrder: text } : p
-                  )
+                    p.id === item.id
+                      ? { ...p, editableQuantityToOrder: text }
+                      : p,
+                  ),
                 )
               }
               keyboardType="numeric"
-              editable={showControls} // only editable in edit mode
-              style={[
-                styles.input,
-                {
-                  color: colorScheme === "dark" ? "#fff" : "#000",
-                  borderColor: colorScheme === "dark" ? "#555" : "#ccc",
-                },
-              ]}
-            />
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={{ color: colorScheme === "dark" ? "#ccc" : "#555" }}>
-              Classification
-            </Text>
-            <TextInput
-              value={item.editableClassification}
-              onChangeText={(text) =>
-                setProducts((prev) =>
-                  prev.map((p) =>
-                    p.id === item.id ? { ...p, editableClassification: text } : p
-                  )
-                )
-              }
-              editable={showControls} // only editable in edit mode
+              editable={showControls}
               style={[
                 styles.input,
                 {
@@ -212,6 +201,35 @@ export default function ProductsScreen() {
           </View>
         </View>
 
+        {/* Full-width row for Classification */}
+        <View style={{ marginBottom: 12 }}>
+          <Text style={{ color: colorScheme === "dark" ? "#ccc" : "#555" }}>
+            Classification
+          </Text>
+          <TextInput
+            value={item.editableClassification}
+            onChangeText={(text) =>
+              setProducts((prev) =>
+                prev.map((p) =>
+                  p.id === item.id ? { ...p, editableClassification: text } : p,
+                ),
+              )
+            }
+            editable={showControls}
+            multiline={true} // ✅ allow text to wrap
+            style={[
+              styles.input,
+              {
+                color: colorScheme === "dark" ? "#fff" : "#000",
+                borderColor: colorScheme === "dark" ? "#555" : "#ccc",
+                minHeight: 40,
+                textAlignVertical: "top",
+              },
+            ]}
+          />
+        </View>
+
+        {/* Update / Delete Buttons */}
         {showControls && (
           <View style={styles.row}>
             <TouchableOpacity
@@ -222,7 +240,7 @@ export default function ProductsScreen() {
                   item.editableQuantity,
                   item.editableThreshold,
                   item.editableQuantityToOrder,
-                  item.editableClassification
+                  item.editableClassification,
                 )
               }
             >
@@ -238,14 +256,15 @@ export default function ProductsScreen() {
           </View>
         )}
 
+        {/* Status */}
         <Text
           style={{
             color:
               item.status === "High"
                 ? "#4caf50"
                 : item.status === "Warning"
-                ? "#ff9800"
-                : "#f44336",
+                  ? "#ff9800"
+                  : "#f44336",
             fontWeight: "600",
             marginTop: 8,
           }}
@@ -255,19 +274,189 @@ export default function ProductsScreen() {
       </View>
     );
   };
+  // const renderItem = ({ item }: { item: any }) => {
+  //   return (
+  //     <View
+  //       style={[
+  //         styles.item,
+  //         {
+  //           backgroundColor: colorScheme === "dark" ? "#1e1e1e" : "#fff",
+  //           borderColor: colorScheme === "dark" ? "#333" : "#ccc",
+  //         },
+  //       ]}
+  //     >
+  //       <Text
+  //         style={[
+  //           styles.name,
+  //           { color: colorScheme === "dark" ? "#fff" : "#000" },
+  //         ]}
+  //       >
+  //         {item.name} ({item.barcode})
+  //       </Text>
+
+  //       <View style={styles.row}>
+  //         <View style={styles.inputGroup}>
+  //           <Text style={{ color: colorScheme === "dark" ? "#ccc" : "#555" }}>
+  //             Quantity
+  //           </Text>
+  //           <TextInput
+  //             value={item.editableQuantity}
+  //             onChangeText={(text) =>
+  //               setProducts((prev) =>
+  //                 prev.map((p) =>
+  //                   p.id === item.id ? { ...p, editableQuantity: text } : p,
+  //                 ),
+  //               )
+  //             }
+  //             keyboardType="numeric"
+  //             editable={showControls} // only editable in edit mode
+  //             style={[
+  //               styles.input,
+  //               {
+  //                 color: colorScheme === "dark" ? "#fff" : "#000",
+  //                 borderColor: colorScheme === "dark" ? "#555" : "#ccc",
+  //               },
+  //             ]}
+  //           />
+  //         </View>
+
+  //         <View style={styles.inputGroup}>
+  //           <Text style={{ color: colorScheme === "dark" ? "#ccc" : "#555" }}>
+  //             Threshold
+  //           </Text>
+  //           <TextInput
+  //             value={item.editableThreshold}
+  //             onChangeText={(text) =>
+  //               setProducts((prev) =>
+  //                 prev.map((p) =>
+  //                   p.id === item.id ? { ...p, editableThreshold: text } : p,
+  //                 ),
+  //               )
+  //             }
+  //             keyboardType="numeric"
+  //             editable={showControls} // only editable in edit mode
+  //             style={[
+  //               styles.input,
+  //               {
+  //                 color: colorScheme === "dark" ? "#fff" : "#000",
+  //                 borderColor: colorScheme === "dark" ? "#555" : "#ccc",
+  //               },
+  //             ]}
+  //           />
+  //         </View>
+
+  //         <View style={styles.inputGroup}>
+  //           <Text style={{ color: colorScheme === "dark" ? "#ccc" : "#555" }}>
+  //             Order QTY
+  //           </Text>
+  //           <TextInput
+  //             value={item.editableQuantityToOrder}
+  //             onChangeText={(text) =>
+  //               setProducts((prev) =>
+  //                 prev.map((p) =>
+  //                   p.id === item.id
+  //                     ? { ...p, editableQuantityToOrder: text }
+  //                     : p,
+  //                 ),
+  //               )
+  //             }
+  //             keyboardType="numeric"
+  //             editable={showControls} // only editable in edit mode
+  //             style={[
+  //               styles.input,
+  //               {
+  //                 color: colorScheme === "dark" ? "#fff" : "#000",
+  //                 borderColor: colorScheme === "dark" ? "#555" : "#ccc",
+  //               },
+  //             ]}
+  //           />
+  //         </View>
+
+  //         <View style={styles.inputGroup}>
+  //           <Text style={{ color: colorScheme === "dark" ? "#ccc" : "#555" }}>
+  //             Classification
+  //           </Text>
+  //           <TextInput
+  //             value={item.editableClassification}
+  //             onChangeText={(text) =>
+  //               setProducts((prev) =>
+  //                 prev.map((p) =>
+  //                   p.id === item.id
+  //                     ? { ...p, editableClassification: text }
+  //                     : p,
+  //                 ),
+  //               )
+  //             }
+  //             editable={showControls} // only editable in edit mode
+  //             style={[
+  //               styles.input,
+  //               {
+  //                 color: colorScheme === "dark" ? "#fff" : "#000",
+  //                 borderColor: colorScheme === "dark" ? "#555" : "#ccc",
+  //               },
+  //             ]}
+  //           />
+  //         </View>
+  //       </View>
+
+  //       {showControls && (
+  //         <View style={styles.row}>
+  //           <TouchableOpacity
+  //             style={[styles.button, { backgroundColor: "#4caf50" }]}
+  //             onPress={() =>
+  //               handleUpdate(
+  //                 item.barcode,
+  //                 item.editableQuantity,
+  //                 item.editableThreshold,
+  //                 item.editableQuantityToOrder,
+  //                 item.editableClassification,
+  //               )
+  //             }
+  //           >
+  //             <Text style={styles.buttonText}>Update</Text>
+  //           </TouchableOpacity>
+
+  //           <TouchableOpacity
+  //             style={[styles.button, { backgroundColor: "#f44336" }]}
+  //             onPress={() => handleDelete(item.barcode)}
+  //           >
+  //             <Text style={styles.buttonText}>Delete</Text>
+  //           </TouchableOpacity>
+  //         </View>
+  //       )}
+
+  //       <Text
+  //         style={{
+  //           color:
+  //             item.status === "High"
+  //               ? "#4caf50"
+  //               : item.status === "Warning"
+  //                 ? "#ff9800"
+  //                 : "#f44336",
+  //           fontWeight: "600",
+  //           marginTop: 8,
+  //         }}
+  //       >
+  //         Status: {item.status}
+  //       </Text>
+  //     </View>
+  //   );
+  // };
 
   return (
     <View style={{ flex: 1 }}>
       {/* Settings toggle */}
       <View style={styles.settingsContainer}>
-        <TouchableOpacity
-          onPress={() => setShowControls(!showControls)}
-          style={styles.settingsButton}
-        >
-          <Text style={styles.settingsText}>
-            {showControls ? "Hide Controls" : "Show Controls"}
-          </Text>
-        </TouchableOpacity>
+        {role !== "GM" && (
+          <TouchableOpacity
+            onPress={() => setShowControls(!showControls)}
+            style={styles.settingsButton}
+          >
+            <Text style={styles.settingsText}>
+              {showControls ? "Hide Controls" : "Show Controls"}
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       <FlatList
