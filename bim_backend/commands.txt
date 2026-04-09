@@ -18,6 +18,13 @@ pip install aiosmtplib
 pip install email-validator
 pip install python-dotenv
 
+# April 9 Changes
+pip install python-jose passlib[bcrypt]
+npx expo install expo-secure-store
+
 -- Python environment-related commands
 conda create -n myenv python=3.11
 conda remove --name <environment_name> --all
+
+# Check current environments
+conda info --envs

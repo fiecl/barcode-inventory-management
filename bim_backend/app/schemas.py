@@ -70,7 +70,7 @@ class ProductInfo(BaseModel):
 #     threshold: int
 class ScanLogBase(BaseModel):
     purpose: str
-    scanned_by: str
+    scanned_by: str #EmailStr
     product_id: int
     quantity: int
     threshold: int
@@ -91,3 +91,19 @@ class ScanLogOut(ScanLogBase):
 # ---------- For Product Scan ----------
 class ProductScan(BaseModel):
     decrement_by: int
+
+# April 9, 2026 Changes
+# ---------- Auth Schemas ----------
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str
+    role: str  # admin, scanner, user, etc.
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+class TokenOut(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    role: str

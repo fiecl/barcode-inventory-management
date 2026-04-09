@@ -61,3 +61,12 @@ class ScanLog(Base):
     classification = Column(String, nullable=True)  # NEW FIELD
 
     product = relationship("ProductDB", back_populates="scan_logs")
+
+# April 9, 2026 Changes
+class UserDB(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True, nullable=False)
+    password_hash = Column(String, nullable=False)
+    role = Column(String, nullable=False)  # 🔥 key field
